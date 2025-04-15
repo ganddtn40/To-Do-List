@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #f0f7ff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2196F3;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"], input[type="time"] {
+            padding: 12px 20px;
+            border: 2px solid #e3f2fd;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="time"]:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .todo-list {
+            list-style: none;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8fbff;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border: 1px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .todo-item:hover {
+            transform: translateX(5px);
+            border-color: #bbdefb;
+        }
+
+        .todo-item.completed {
+            background: #e3f2fd;
+            opacity: 0.8;
+        }
+
+        .todo-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            accent-color: #2196F3;
+        }
+
+        .task-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .time {
+            color: #64B5F6;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .delete-btn {
+            background: #ff4444;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .delete-btn:hover {
+            background: #cc0000;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            .input-section {
+                flex-direction: column;
+            }
+
+            input[type="text"], input[type="time"], button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <div class="input-section">
+            <input type="text" id="taskInput" placeholder="Add a new task...">
+            <input type="time" id="timeInput">
+            <button onclick="addTask()">Add</button>
+        </div>
+        <ul class="todo-list" id="todoList"></ul>
+    </div>
+
+    <script>
+        function formatTimeWithTimeZone(timeString) {
+            if (!timeString) return '';
+            
+            // Get local timezone
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            
+            // Create a date object for today with the input time
+            const [hours, minutes] = timeString.split(':');
+            const date = new Date();
+            date.setHours(hours, minutes);
+            
+            // Format the time according to the local timezone
+            const timeFormat = new Intl.DateTimeFormat('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZoneName: 'short'
+            });
+            
+            return timeFormat.format(date);
+        }
+
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const timeInput = document.getElementById('timeInput');
+            const task = input.value.trim();
+            const time = timeInput.value;
+            
+            if (task !== '') {
+                const list = document.getElementById('todoList');
+                const li = document.createElement('li');
+                li.className = 'todo-item';
+                
+                const formattedTime = formatTimeWithTimeZone(time);
+                
+                li.innerHTML = `
+                    <div class="task-content">
+                        <input type="checkbox" onclick="toggleComplete(this)">
+                        <span>${task}</span>
+                        <span class="time">${formattedTime}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTask(this)">Delete</button>
+                `;
+                
+                list.appendChild(li);
+                input.value = '';
+                timeInput.value = '';
+            }
+        }
+
+        function toggleComplete(checkbox) {
+            const todoItem = checkbox.parentElement.parentElement;
+            todoItem.classList.toggle('completed');
+        }
+
+        function deleteTask(button) {
+            const todoItem = button.parentElement;
+            todoItem.remove();
+        }
+
+        // Allow adding tasks with Enter key
+        document.getElementById('taskInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+    </script>
+</body>
+</html>
